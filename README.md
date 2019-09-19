@@ -21,7 +21,7 @@ docker-compose up -d
 
 When all containers are running, configure the connector. Go the the config folder and run:
 ```bash
-bash push_configs.sh
+bash push_config.sh
 ```
 
 After a few seconds the container will put messages from kafka topics into elasticsearch
@@ -41,7 +41,7 @@ echo '{"username":"hello","id":"a"}' | kafkacat -P -b localhost -t my_test
 After data has been added to a topic, you should see the topic as an index in kibana.
 
 ### Access kibana
-Kibana webui can be located at:
+Kibana webui can be found at:
 ```
 http://localhost:5601
 ```
@@ -49,4 +49,4 @@ http://localhost:5601
 
 
 # Troubleshooting
-1. If you can't find the index in kibana, try restarting the connector-container. Either stop all containers and start then again, or just restart the connector-container.
+1. If you can't find the index in kibana, try restarting the connector-container. 
