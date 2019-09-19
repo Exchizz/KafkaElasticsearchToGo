@@ -2,6 +2,10 @@ version: "3.5"
 
 volumes:
   es_data:
+  kafka_data:
+  kafka_logs:
+  zookeeper_data:
+  zookeeper_logs:
 
 
 
@@ -59,6 +63,8 @@ services:
           hostname: zookeeper
           image: jplock/zookeeper
           restart: always
+          volumes:
+            - zookeeper_data:/tmp/zookeeper
           ports:
             - "2181:2181" 
 
@@ -66,15 +72,14 @@ services:
           hostname: kafka
           image: ches/kafka
           restart: always
+          volumes: 
+            - kafka_data:/data
           ports:
             - "7203:7203"   
             - "9092:9092"
           environment:
             - KAFKA_ADVERTISED_HOST_NAME=kafka
             - ZOOKEEPER_IP=zookeeper
+            - KAFKA_LOG_RETENTION_HOURS=-1
           depends_on:
             - zookeeper
-
-#  kibana_config:
-#    file: ./kibana/config/kibana.yml
-
