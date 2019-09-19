@@ -27,7 +27,7 @@ bash push_config.sh
 After a few seconds the container will put messages from kafka topics into elasticsearch
 
 
-### To add a topic
+### Add a topic
 ```bash
 ./kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic my_test
 ```
