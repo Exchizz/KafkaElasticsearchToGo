@@ -1,0 +1,14 @@
+ {
+ "name" : "es_sink",
+ "config" : {
+  "connector.class" : "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+  "tasks.max" : "3",
+  "connection.url" : "http://elasticsearch:9200",
+  "topics.regex": "(?!_)(.*)",
+  "type.name" : "true",
+  "key.ignore" : "true",
+  "schema.ignore" : "true",
+  "max.in.flight.requests": 100,
+  "flush.timeout.ms":"50000"
+ }
+}

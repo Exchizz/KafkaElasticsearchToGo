@@ -1,0 +1,80 @@
+version: "3.5"
+
+volumes:
+  es_data:
+
+
+
+services:
+        elasticsearch:
+          image: elasticsearch:7.2.1
+          hostname: elasticsearch
+          volumes:
+            - es_data:/usr/share/elasticsearch/data
+            - ./configs/kibana.yml:/usr/share/kibana/config/kibana.yml
+          command: ["elasticsearch","-Egateway.expected_nodes=1", "-Enetwork.host=_eth0:ipv4_", "-Ediscovery.type=single-node"]
+
+        kibana:
+          hostname: kibana
+          image: docker.elastic.co/kibana/kibana:7.2.1
+          ports:
+            - "5601:5601"
+          environment:
+            - NODE_OPTIONS=--max_old_space_size=4096
+          depends_on:
+            - elasticsearch
+
+        connect:
+          hostname: connect
+          image: confluentinc/cp-kafka-connect
+          ports:
+            - "8083:8083"
+          environment:
+            CONNECT_BOOTSTRAP_SERVERS: 'kafka:9092'
+            CONNECT_REST_ADVERTISED_HOST_NAME: connect
+            CONNECT_REST_PORT: 8083
+            CONNECT_GROUP_ID: swarm-connect-group
+            CONNECT_CONFIG_STORAGE_TOPIC: _docker-connect-configs
+            CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+            CONNECT_OFFSET_STORAGE_TOPIC: _docker-connect-offsets
+            CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_STATUS_STORAGE_TOPIC: _docker-connect-status
+            CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+            CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+            CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+            CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+            CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: 'false'
+            CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: 'false'
+            CONNECT_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+            CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components'
+            CONNECT_OFFSET_FLUSH_TIMEOUT_MS: "50000"
+          restart: always
+          depends_on: 
+            - kafka
+            - elasticsearch
+
+        zookeeper:
+          hostname: zookeeper
+          image: jplock/zookeeper
+          restart: always
+          ports:
+            - "2181:2181" 
+
+        kafka:
+          hostname: kafka
+          image: ches/kafka
+          restart: always
+          ports:
+            - "7203:7203"   
+            - "9092:9092"
+          environment:
+            - KAFKA_ADVERTISED_HOST_NAME=kafka
+            - ZOOKEEPER_IP=zookeeper
+          depends_on:
+            - zookeeper
+
+#  kibana_config:
+#    file: ./kibana/config/kibana.yml
+
