@@ -83,3 +83,12 @@ services:
             - KAFKA_LOG_RETENTION_HOURS=-1
           depends_on:
             - zookeeper
+
+
+        maanger:
+          image: sheepkiller/kafka-manager
+          environment:
+            ZK_HOSTS: "zookeeper:2181"
+            APPLICATION_SECRET: "letmein"
+          ports:
+            - "9000:9000"
